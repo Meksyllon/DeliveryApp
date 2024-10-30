@@ -10,3 +10,4 @@ D:\Programming\C#\DeliveryApp\DeliveryApp.DataAccess.MSSQL\obj\Debug\net8.0\Deli
 D:\Programming\C#\DeliveryApp\DeliveryApp.DataAccess.MSSQL\obj\Debug\net8.0\refint\DeliveryApp.DataAccess.MSSQL.dll
 D:\Programming\C#\DeliveryApp\DeliveryApp.DataAccess.MSSQL\obj\Debug\net8.0\DeliveryApp.DataAccess.MSSQL.pdb
 D:\Programming\C#\DeliveryApp\DeliveryApp.DataAccess.MSSQL\obj\Debug\net8.0\ref\DeliveryApp.DataAccess.MSSQL.dll
+D:\Programming\C#\DeliveryApp\DeliveryApp.DataAccess.MSSQL\obj\Debug\net8.0\DeliveryApp.DataAccess.MSSQL.sourcelink.json
