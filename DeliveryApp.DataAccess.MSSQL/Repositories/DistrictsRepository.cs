@@ -34,37 +34,39 @@ namespace DeliveryApp.DataAccess.MSSQL.Repositories
                 .FirstOrDefaultAsync(d => d.Title == title);
         }
 
-        public async Task Add(DistrictEntity district)
+        public async Task Add(string title)
         {
+            var district = new DistrictEntity()
+            {
+                Title = title,
+                Packages = new List<PackageEntity>()
+            };
+
             await Console.Out.WriteLineAsync($"district {district.Title} was added");
             await _dbContext.AddAsync(district);
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task Add(string title, List<PackageEntity> packages)
-        {
-            var district = new DistrictEntity()
-            {
-                Title = title,
-                Packages = packages
-            };
-            Add(district);            
-        }
-
-        public async Task Update(int id, string title, List<PackageEntity> packages)
+        public async Task Update(int id, string title)
         {
             await _dbContext.Districts
                 .Where(d => d.Id == id)
                 .ExecuteUpdateAsync(s => s
-                    .SetProperty(d => d.Title, title)
-                    .SetProperty(d => d.Packages, packages));
+                    .SetProperty(d => d.Title, title));
+            await Console.Out.WriteLineAsync($"District {id} has been updated");
         }
 
         public async Task Delete(int id)
         {
+            await _dbContext.Packages
+                .Where(p => p.DistrictId == id)
+                .ExecuteDeleteAsync();
+
             await _dbContext.Districts
                 .Where(d => d.Id == id)
                 .ExecuteDeleteAsync();
+
+            await Console.Out.WriteLineAsync($"District {id} has been deleted");
         }
     }
 }

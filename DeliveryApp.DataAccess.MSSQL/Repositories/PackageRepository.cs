@@ -39,29 +39,42 @@ namespace DeliveryApp.DataAccess.MSSQL.Repositories
                 .ToListAsync();
         }
 
-        public async Task Add(PackageEntity package)
+        public async Task<List<PackageEntity>> GetOrderedByOrderTime()
         {
-            package.District.Packages.Add(package);
-            await Console.Out.WriteLineAsync($"package {package.OrderTime} was added");
+            return await _dbContext.Packages
+                .AsNoTracking()
+                .OrderBy(p => p.OrderTime)
+                .ToListAsync();
+        }
 
-            await _dbContext.AddAsync(package);
-            await _dbContext.SaveChangesAsync();
+        public async Task<List<PackageEntity>> GetOrderedByDescendingOrderTime()
+        {
+            return await _dbContext.Packages
+                .AsNoTracking()
+                .OrderByDescending(p => p.OrderTime)
+                .ToListAsync();
         }
 
         public async Task Add(float weight, DateTime ordertime, int districtId)
         {
             var district = await _dbContext.Districts.FirstOrDefaultAsync(d => d.Id == districtId)
-                ?? throw new Exception();
+                ?? throw new ArgumentException("Provided district is not exists");
 
             var package = new PackageEntity()
             {
                 Weight = weight,
                 OrderTime = ordertime,
                 DistrictId = districtId,
-                District = district
+                District = district                
             };
 
-            await Add(package);
+            package.District.Packages ??= new List<PackageEntity>();
+            package.District.Packages.Add(package);
+
+            await Console.Out.WriteLineAsync($"package {package.OrderTime} was added");
+
+            await _dbContext.AddAsync(package);
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task Update(int id, float weight, DateTime ordertime, int districtId)
@@ -76,13 +89,22 @@ namespace DeliveryApp.DataAccess.MSSQL.Repositories
                     .SetProperty(p => p.OrderTime, ordertime)
                     .SetProperty(p => p.DistrictId, districtId)
                     .SetProperty(p => p.District, district));
+            await Console.Out.WriteLineAsync($"Package {id} has been updated");
         }
 
         public async Task Delete(int id)
         {
+            var package = await GetById(id);
+
+            _dbContext.Districts
+                .FirstOrDefault(d => d.Id == package.DistrictId)
+                .Packages
+                .Remove(package);
+
             await _dbContext.Packages
-                .Where(d => d.Id == id)
+                .Where(p => p.Id == id)
                 .ExecuteDeleteAsync();
+            await Console.Out.WriteLineAsync($"Package {id} has been deleted");
         }
     }
 }
